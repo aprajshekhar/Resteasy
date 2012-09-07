@@ -24,77 +24,152 @@ public class TypeMappingTest
    @Test
    public void acceptXMLOnlyRequestNoProducesNoExtension() throws Exception
    {
-      requestAndAssert("noproduces", null, "application/xml", "application/xml");
+      requestAndAssert("noproduces", null, "application/xml", "application/xml",true);
    }
 
    @Test
    public void acceptJSONOnlyRequestNoProducesNoExtension() throws Exception
    {
-      requestAndAssert("noproduces", null, "application/json", "application/json");
+      requestAndAssert("noproduces", null, "application/json", "application/json",true);
    }
 
    @Test
    public void acceptNullRequestNoProducesJSONExtension() throws Exception
    {
-      requestAndAssert("noproduces", "json", null, "application/json");
+      requestAndAssert("noproduces", "json", null, "application/json",true);
    }
 
    @Test
    public void acceptNullRequestNoProducesXMLExtension() throws Exception
    {
-      requestAndAssert("noproduces", "xml", null, "application/xml");
+      requestAndAssert("noproduces", "xml", null, "application/xml",true);
    }
 
    @Test
    public void acceptJSONOnlyRequestNoProducesJSONExtension() throws Exception
    {
-      requestAndAssert("noproduces", "json", "application/json", "application/json");
+      requestAndAssert("noproduces", "json", "application/json", "application/json",true);
    }
 
    @Test
    public void acceptJSONOnlyRequestNoProducesXMLExtension() throws Exception
    {
-      requestAndAssert("noproduces", "xml", "application/json", "application/xml");
+      requestAndAssert("noproduces", "xml", "application/json", "application/xml",true);
    }
 
    @Test
    public void acceptJSONAndXMLRequestNoProducesJSONExtension() throws Exception
    {
       requestAndAssert("noproduces", "json", "application/json, application/xml",
-              "application/json");
+              "application/json",true);
    }
 
    @Test
    public void acceptXMLAndJSONRequestNoProducesJSONExtension() throws Exception
    {
       requestAndAssert("noproduces", "json", "application/xml, application/json",
-              "application/json");
+              "application/json",true);
    }
 
    @Test
    public void acceptXMLOnlyRequestNoProducesXMLExtension() throws Exception
    {
-      requestAndAssert("noproduces", "xml", "application/xml", "application/xml");
+      requestAndAssert("noproduces", "xml", "application/xml", "application/xml",true);
    }
 
    @Test
    public void acceptXMLOnlyRequestNoProducesJSONExtension() throws Exception
    {
-      requestAndAssert("noproduces", "json", "application/xml", "application/json");
+      requestAndAssert("noproduces", "json", "application/xml", "application/json",true);
    }
 
    @Test
    public void acceptJSONAndXMLRequestNoProducesXMLExtension() throws Exception
    {
       requestAndAssert("noproduces", "xml", "application/json, application/xml",
-              "application/xml");
+              "application/xml",true);
    }
 
    @Test
    public void acceptXMLAndJSONRequestNoProducesXMLExtension() throws Exception
    {
       requestAndAssert("noproduces", "xml", "application/xml, application/json",
-              "application/xml");
+              "application/xml",true);
+   }
+   @Test
+   public void acceptXMLOnlyRequestNoProducesNoExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", null, "application/xml", "application/xml",false);
+   }
+
+   @Test
+   public void acceptJSONOnlyRequestNoProducesNoExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", null, "application/json", "application/json",false);
+   }
+
+   @Test
+   public void acceptNullRequestNoProducesJSONExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "json", null, "application/json",false);
+   }
+
+   @Test
+   public void acceptNullRequestNoProducesXMLExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "xml", null, "application/xml",false);
+   }
+
+   @Test
+   public void acceptJSONOnlyRequestNoProducesJSONExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "json", "application/json", "application/json",false);
+   }
+
+   @Test
+   public void acceptJSONOnlyRequestNoProducesXMLExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "xml", "application/json", "application/xml",false);
+   }
+
+   @Test
+   public void acceptJSONAndXMLRequestNoProducesJSONExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "json", "application/json, application/xml",
+              "application/json",false);
+   }
+
+   @Test
+   public void acceptXMLAndJSONRequestNoProducesJSONExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "json", "application/xml, application/json",
+              "application/json",false);
+   }
+
+   @Test
+   public void acceptXMLOnlyRequestNoProducesXMLExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "xml", "application/xml", "application/xml",false);
+   }
+
+   @Test
+   public void acceptXMLOnlyRequestNoProducesJSONExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "json", "application/xml", "application/json",false);
+   }
+
+   @Test
+   public void acceptJSONAndXMLRequestNoProducesXMLExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "xml", "application/json, application/xml",
+              "application/xml",false);
+   }
+
+   @Test
+   public void acceptXMLAndJSONRequestNoProducesXMLExtensionNotAtEnd() throws Exception
+   {
+      requestAndAssert("noproduces", "xml", "application/xml, application/json",
+              "application/xml",false);
    }
 
    @Before
@@ -117,13 +192,20 @@ public class TypeMappingTest
    }
 
    private void requestAndAssert(String path, String extension, String accept,
-                                 String expectedContentType) throws Exception
+                                 String expectedContentType, boolean extAtEnd) throws Exception
    {
-      String url = generateURL("/test/" + path);
-      if (extension != null)
+      String url = null;
+      if (extension != null && extAtEnd)
       {
+         url = generateURL("/test/" + path);
          url = url + "." + extension;
       }
+      else if(extension!=null && !extAtEnd){
+         url = "/test"+"."+extension +"/"+path; 
+         url = generateURL(url);
+      }else if(extension==null && path!=null){
+       url = generateURL("/test/"+path);
+   }
       ClientRequest request = new ClientRequest(url);
       if (accept != null)
       {
